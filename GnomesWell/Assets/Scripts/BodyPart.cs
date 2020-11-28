@@ -28,7 +28,7 @@ public class BodyPart : MonoBehaviour {
 
 		this.tag = "Untagged";
 
-		transform.SetParent(null, true);
+		//transform.SetParent(null, true);
 	}
 
 	// Every frame, if we're detached, remove physics if the rigidbody is 

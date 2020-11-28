@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 // BEGIN 2d_gamemanager
 // Manages the game state.
@@ -626,6 +627,11 @@ true) {
 		// Now reset the game to create a new gnome.
 		Reset();
 	}
+
+	public void LoadMainMenu()
+    {
+		SceneManager.LoadScene(0);
+    }
     // END 2d_gamemanager_restartgame
 
 }

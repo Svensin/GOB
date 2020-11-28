@@ -29,6 +29,10 @@ public class MainMenu : MonoBehaviour {
 	public Sprite adsIconOnSprite;
 	public Sprite adsIconOffSprite;
 
+	public GameObject kekEasterEgg;
+	public GameObject textOfKekEasterEgg;
+	public float kekEasterEggPauseTime = 3f;
+	public float kekEasterEggTextPauseTime = 3f;
 
 	GameObject currentMenu;
 
@@ -40,12 +44,15 @@ public class MainMenu : MonoBehaviour {
 	Image adsButtonImage;
 	Image adsIconImage;
 
+	ExitCounter exitCounter;
+
 	public void Start() {
 		currentMenu = mainMenu;
 		currentMenu.SetActive(true);
 		exitWarningMenu.SetActive(false);
 		settingsMenu.SetActive(false);
 		chooseLevelMenu.SetActive(false);
+		exitCounter = GameObject.Find("Exit Counter").GetComponent<ExitCounter>();
 
 	musicButtonImage = musicButton.GetComponent<Image>();
 		musicIconImage = musicIcon.GetComponent<Image>();
@@ -134,5 +141,36 @@ public class MainMenu : MonoBehaviour {
     {
 		Application.Quit();
     }
+
+	public void ExitButtonTapped()
+    {
+		exitCounter.exitTapped();
+
+		int randomNumber = Random.Range(1, SceneManager.sceneCountInBuildSettings);
+		Debug.Log(randomNumber);
+
+		if (exitCounter.exitTappedTimes == 1)
+        {
+			SceneManager.LoadScene(randomNumber);
+        }
+        else if (exitCounter.exitTappedTimes == 2)
+		{
+			StartCoroutine(KekEasterEggAppear(kekEasterEggPauseTime,kekEasterEggTextPauseTime, randomNumber));
+		}
+		else
+		{
+			ActivateExitWarningMenu();
+        }
+    }
+
+	public IEnumerator KekEasterEggAppear(float timeForBackground, float timeForText, int randomNumber)
+    {
+		currentMenu.SetActive(false);
+		kekEasterEgg.SetActive(true);
+		yield return new WaitForSecondsRealtime(timeForBackground);
+		textOfKekEasterEgg.SetActive(true);
+		yield return new WaitForSecondsRealtime(timeForText);
+		SceneManager.LoadScene(randomNumber);
+	}
 }
 // END 2d_mainmenu

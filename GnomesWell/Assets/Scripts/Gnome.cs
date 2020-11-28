@@ -99,7 +99,11 @@ public class Gnome : MonoBehaviour {
                 {
 					meh.enabled = false;
                 }*/
+
+				
 			}
+
+			DestroyLimb(child);
 		}
 
 		// find all child objects, and randomly disconnect their joints
@@ -172,6 +176,12 @@ public class Gnome : MonoBehaviour {
 
 		StartCoroutine(ReleaseGhost());
 	}
+
+	IEnumerator DestroyLimb(Transform limb)
+    {
+		yield return new WaitForSeconds(1f);
+		Destroy(limb.gameObject);
+    }
 
 	IEnumerator ReleaseGhost() {
 
