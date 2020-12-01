@@ -47,6 +47,8 @@ public class GameManager : Singleton<GameManager> {
 
 	public float impetusForce = 10f;
 
+	public Transform collectables;
+
 	// If true, ignore all damage (but still show damage effects)
 	// The 'get; set;' make this a property, to make it show
 	// up in the list of methods in the Inspector for Unity Events
@@ -363,6 +365,8 @@ public class GameManager : Singleton<GameManager> {
 				// Tell the gnome that it died
 				currentGnome.DestroyGnome(damageType);
 
+				ActivateCollectables();
+
 				// Remove the Gnome
 				RemoveGnome();
 
@@ -407,10 +411,10 @@ public class GameManager : Singleton<GameManager> {
 			healthBar.GetChild(healthPoints).GetComponent<Image>().sprite = fullHeart;
 			healthPoints++;
 
-			StartCoroutine(plusOneAnimation(healthBar.Find("+1 Text")));
+			heal.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+			heal.gameObject.GetComponent<Collider2D>().enabled = false;
 
-			heal.GetComponent<SpriteRenderer>().enabled = false;
-			heal.GetComponent<Collider2D>().enabled = false;
+			StartCoroutine(plusOneAnimation(healthBar.Find("+1 Text")));
 		}
 	}
 
@@ -426,16 +430,10 @@ public class GameManager : Singleton<GameManager> {
     {
 		gnomeHasShield = true;
 
+		shield.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+		shield.gameObject.GetComponent<Collider2D>().enabled = false;
+
 		currentGnome.activateOutline();
-
-		Destroy(shield.gameObject);
-		Debug.Log("Shield has been collected successfully");
-    }
-
-	public void TeleportGnome(Transform pointToTeleport)
-    {
-		//currentGnome.transform.position = Vector3.Lerp(currentGnome.transform.position,pointToTeleport.transform.position, 1f);
-		
     }
 
 	public void StartTeleportCoroutine(Transform pointToTeleport)
@@ -631,6 +629,25 @@ true) {
 	public void LoadMainMenu()
     {
 		SceneManager.LoadScene(0);
+    }
+
+	public void ActivateCollectables()
+    {
+        foreach (Transform collectable in collectables)
+        {
+			if (collectable.name.CompareTo("Teleport") == 0)
+            {
+				Transform teleport = collectable.Find("Dagger teleport");
+
+				teleport.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+				teleport.gameObject.GetComponent<Collider2D>().enabled = true;
+			}
+			else
+            {
+				collectable.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+				collectable.gameObject.GetComponent<Collider2D>().enabled = true;
+			}
+		}
     }
     // END 2d_gamemanager_restartgame
 
