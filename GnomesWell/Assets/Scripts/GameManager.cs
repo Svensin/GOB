@@ -14,7 +14,7 @@ public class GameManager : Singleton<GameManager> {
 	public GameObject startingPoint;
 
 	// The rope object, which lowers and raises the gnome.
-	public Rope rope;
+	public RopeDrawer rope;
 
 	// The fade-out script (triggered when the game resets)
 	public Fade fade;
@@ -216,12 +216,14 @@ public class GameManager : Singleton<GameManager> {
             Quaternion.identity);                                                     
         currentGnome = newGnome.GetComponent<Gnome>();
 
+		rope.currentGnome = newGnome;
+
         // Make the rope visible
         rope.gameObject.SetActive(true);
 
         // Connect the rope's trailing end to whichever rigidbody the 
         // Gnome object wants (e.g. his foot)
-        rope.connectedObject = currentGnome.ropeBody;
+        rope.connectedObject = currentGnome.ropeBody.transform;
 
         // Reset the rope's length to the default
         rope.ResetLength();
@@ -451,7 +453,7 @@ public class GameManager : Singleton<GameManager> {
 
 		currentGnome = newGome;
 
-		rope.connectedObject = currentGnome.ropeBody;
+		rope.connectedObject = currentGnome.ropeBody.transform;
 
 		cameraFollow.target = currentGnome.transform.Find("Body").transform;
 
@@ -516,28 +518,28 @@ public class GameManager : Singleton<GameManager> {
 
 		for (int i = 1; i < howManySegmentsToCreate; i++)
 		{
-			rope.ropeSegments[i].GetComponent<SpringJoint2D>().distance = 4f;
+			rope.ropeSegmentsList[i].GetComponent<SpringJoint2D>().distance = 4f;
 		}
 
 		if ((distanceY % 4) > 0f)
 		{
-			rope.ropeSegments[howManySegmentsToCreate].GetComponent<SpringJoint2D>().distance = distanceY % 4;
+			rope.ropeSegmentsList[howManySegmentsToCreate].GetComponent<SpringJoint2D>().distance = distanceY % 4;
 		}
 
 		yield return new WaitForSeconds(Time.deltaTime);
 
 		for (int i = 1; i < howManySegmentsToCreate; i++)
 		{
-			rope.ropeSegments[i].transform.position = new Vector3(rope.transform.position.x, rope.transform.position.y - i * 4f, rope.transform.position.z);
+			rope.ropeSegmentsList[i].transform.position = new Vector3(rope.transform.position.x, rope.transform.position.y - i * 4f, rope.transform.position.z);
 		}
 		if ((distanceY - (int)distanceY) > 0f)
 		{
-			rope.ropeSegments[howManySegmentsToCreate].transform.position = new Vector3(rope.transform.position.x,
+			rope.ropeSegmentsList[howManySegmentsToCreate].transform.position = new Vector3(rope.transform.position.x,
 				rope.transform.position.y - (howManySegmentsToCreate * 4 + (distanceY % 4)), rope.transform.position.z);
 		}
 
 
-		legJoint.connectedBody = rope.ropeSegments[howManySegmentsToCreate].GetComponent<Rigidbody2D>();
+		legJoint.connectedBody = rope.ropeSegmentsList[howManySegmentsToCreate].GetComponent<Rigidbody2D>();
 
 		yield return new WaitForSeconds(2 * Time.deltaTime);
 
