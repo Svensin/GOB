@@ -226,7 +226,8 @@ public class GameManager : Singleton<GameManager> {
         rope.connectedObject = currentGnome.ropeBody.transform;
 
         // Reset the rope's length to the default
-        rope.ResetLength();
+
+		rope.StartNewRopeCreation();
 
         // Tell the cameraFollow to start tracking the new gnome object
         cameraFollow.target = currentGnome.cameraFollowTarget;
