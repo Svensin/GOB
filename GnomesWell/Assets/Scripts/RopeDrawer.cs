@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RopeDrawer : MonoBehaviour
 {
+    public GameManager gameManager;
+
     public Transform pointToTeleport;
 
     public GameObject currentGnome;
@@ -24,7 +26,7 @@ public class RopeDrawer : MonoBehaviour
 
     public float ropeSpeed;
 
-    bool isRopeCreated = false;
+    public bool isRopeCreated = false;
 
     public bool isIncreasing { get; set; }
     public bool isDecreasing { get; set; }
@@ -94,7 +96,7 @@ public class RopeDrawer : MonoBehaviour
         //    }
         //}
 
-        if (isIncreasing)
+        if (isIncreasing && !gameManager.isLevelMoving)
         {
             if (topSegmentJoint.distance > ropeSegmentLength)
             {
@@ -109,7 +111,7 @@ public class RopeDrawer : MonoBehaviour
             
         }
 
-        if (isDecreasing && ropeSegmentsList.Count > 1)
+        if (isDecreasing && ropeSegmentsList.Count > 1 && !gameManager.isLevelMoving)
         {
             if (topSegmentJoint.distance <= 0.005f)
             {
@@ -149,6 +151,12 @@ public class RopeDrawer : MonoBehaviour
 			Destroy(segment);
 		}
 
+        ropeSegmentsList = new List<GameObject>();
+
+        isDecreasing = false;
+        isIncreasing = false;
+
+
         CreateRopeSegment();
 	}
 
@@ -158,7 +166,7 @@ public class RopeDrawer : MonoBehaviour
     }
 
 
-    IEnumerator CreateNewRope(Transform newGnomePosition)
+    public IEnumerator CreateNewRope(Transform newGnomePosition)
     {
 
         Vector3 pointToLeg = new Vector3(newGnomePosition.position.x + 0.55f, newGnomePosition.position.y + 2.2f, newGnomePosition.position.z);

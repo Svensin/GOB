@@ -22,6 +22,18 @@ public class GameManager : Singleton<GameManager> {
 	// The follow script, which will follow the gnome
 	public CameraFollow cameraFollow;
 
+	public GameObject level;
+
+	public Transform wellBottom;
+
+	public float levelMovementSpeed = 1f;
+
+	public bool isLevelMoving = false;
+
+	public bool gnomeIsInZone = false;
+
+	public bool levelHasMoved = false;
+
 	// The 'current' gnome (as opposed to all those dead ones)
 	Gnome currentGnome;
 
@@ -72,109 +84,74 @@ public class GameManager : Singleton<GameManager> {
 	// BEGIN 2d_gamemanager_start_reset
 	void Start() {
 		// When the game starts, call Reset to set up the gnome.
-		Reset ();
+		Reset();
 
 		LegRope = currentGnome.transform.Find("Leg Rope");
 
 
 		currentGnome.transform.parent = GameObject.Find("GameObject").transform;
-		//StartCoroutine(TeleportColldected(pointToTeleport));
 	}
 
-	//IEnumerator LateStart(float waitTime)
-	//{
+	private void Update()
+	{
+		if(currentGnome != null)
+        {
+			if (currentGnome.transform.Find("Body").position.y <= cameraFollow.topLimit &&
+			currentGnome.transform.Find("Body").position.y >= cameraFollow.bottomLimit
+			)
+			{
 
-	//	Vector3 pointToLeg = new Vector3(pointToTeleport.position.x + 0.55f, pointToTeleport.position.y + 2.5f, pointToTeleport.position.z);
-	//	Vector3 distance = rope.transform.position - pointToLeg;
-	//	float distanceY = distance.y;
+				gnomeIsInZone = true;
 
-	//	Debug.Log(distanceY);
+			}
+			else
+			{
 
-	//	float distancex = distance.x;
-	//	Debug.Log("Length added");
+				gnomeIsInZone = false;
+			}
 
-	//	SpringJoint2D legJoint = LegRope.GetComponent<SpringJoint2D>();
-
-	//	legJoint.connectedBody = null;
-
-	//	legJoint.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
-
-
-	//	currentGnome.transform.position = pointToTeleport.position;
-
-
-
-	//	currentGnome.transform.Find("Body").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
-
-	//	int howManySegmentsToCreate = (int)(distanceY);
-
-	//	if ((distanceY - (int)distanceY) > 0f)
-	//	{
-	//		howManySegmentsToCreate++;
-	//	}
-
-	//	Debug.Log(howManySegmentsToCreate + " ; " + distanceY);
-
-	//	for (int i = 0; i < howManySegmentsToCreate; i++)
-	//	{
-	//		rope.CreateRopeSegment();
-	//	}
-
-	//	yield return new WaitForSeconds(Time.deltaTime);
-
-	//	for (int i = 1; i < howManySegmentsToCreate; i++)
-	//	{
-	//		rope.ropeSegments[i].GetComponent<SpringJoint2D>().distance = 1f;
-	//	}
-
-	//	if ((distanceY - (int)distanceY) > 0f)
-	//	{
-	//		rope.ropeSegments[howManySegmentsToCreate].GetComponent<SpringJoint2D>().distance = distanceY - (int)distanceY;
-	//	}
-
-	//	yield return new WaitForSeconds(Time.deltaTime);
-
-	//	for (int i = 1; i < howManySegmentsToCreate; i++)
-	//	{
-	//		rope.ropeSegments[i].transform.position = new Vector3(rope.ropeSegments[i].transform.position.x, rope.ropeSegments[i].transform.position.y - i * 1f, rope.ropeSegments[i].transform.position.z);
-	//	}
-	//	if ((distanceY - (int)distanceY) > 0f)
-	//	{
-	//		rope.ropeSegments[howManySegmentsToCreate].transform.position = new Vector3(rope.ropeSegments[howManySegmentsToCreate].transform.position.x,
-	//			rope.ropeSegments[howManySegmentsToCreate].transform.position.y - (howManySegmentsToCreate + (distanceY - (int)distanceY) - 1), rope.ropeSegments[howManySegmentsToCreate].transform.position.z);
-	//		Debug.Log(rope.ropeSegments[howManySegmentsToCreate].transform.position);
-	//	}
-
-	//	legJoint.connectedBody = rope.ropeSegments[howManySegmentsToCreate].GetComponent<Rigidbody2D>();
-
-	//	yield return new WaitForSeconds(2 * Time.deltaTime);
-
-	//	foreach (GameObject segment in rope.ropeSegments)
-	//	{
-	//		segment.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
-	//	}
-
-	//	yield return new WaitForSeconds(4 * Time.deltaTime);
-
-	//	foreach (GameObject segment in rope.ropeSegments)
-	//	{
-	//		segment.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
-	//	}
+			if (!gnomeIsInZone && !isLevelMoving)
+			{
+				levelHasMoved = false;
+			}
 
 
-	//	//yield return new WaitForSeconds(Time.deltaTime);
+			if (!gnomeIsInZone && !levelHasMoved)
+			{
+				isLevelMoving = false;
+			}
+			else if (gnomeIsInZone && !levelHasMoved && level.transform.position.y <= 0f)
+			{
+				isLevelMoving = true;
+			}
+			else if (gnomeIsInZone && levelHasMoved && level.transform.position.y <= -0.001f)
+			{
+				isLevelMoving = false;
+			}
 
 
-	//	legJoint.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+			if (isLevelMoving && rope.isIncreasing && level.transform.position.y >= -0.05f)
+			{
+				levelHasMoved = true;
+				if (level.transform.position.y <= -wellBottom.localPosition.y - 7f)
+				{
+					level.transform.Translate(Vector3.up * levelMovementSpeed * Time.deltaTime);
+				}
+
+			}
+			if (isLevelMoving && rope.isDecreasing && level.transform.position.y >= -0.05f)
+			{
+				levelHasMoved = true;
 
 
-	//	currentGnome.transform.Find("Body").GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+				level.transform.Translate(Vector3.down * levelMovementSpeed * Time.deltaTime);
+			}
+		}
+		
+    }
 
-	//}
-
-
-	// Reset the entire game.
-	public void Reset() {
+    // Reset the entire game.
+    public void Reset() {
 
         // Turn off the menus, turn on the gameplay UI
         if (gameOverMenu)
@@ -195,6 +172,7 @@ public class GameManager : Singleton<GameManager> {
 
         // Make a new gnome
         CreateNewGnome();
+
 
         // Un-pause the game
         Time.timeScale = 1.0f;
@@ -365,6 +343,7 @@ public class GameManager : Singleton<GameManager> {
 			
 			if (healthPoints == 0)
             {
+				rope.isRopeCreated = false;
 				// Tell the gnome that it died
 				currentGnome.DestroyGnome(damageType);
 
@@ -372,6 +351,8 @@ public class GameManager : Singleton<GameManager> {
 
 				// Remove the Gnome
 				RemoveGnome();
+
+				
 
 				// Reset the game
 				StartCoroutine(ResetAfterDelay());
@@ -386,7 +367,11 @@ public class GameManager : Singleton<GameManager> {
 
         // Wait for delayAfterDeath seconds, then call Reset
         yield return new WaitForSeconds(delayAfterDeath);
-        Reset();
+		isLevelMoving = false;
+		gnomeIsInZone = false;
+		levelHasMoved = false;
+		level.transform.position = Vector3.zero;
+		Reset();
     }
     // END 2d_gamemanager_reset
 
